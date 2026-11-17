@@ -17,6 +17,17 @@
     <preference for="Magento\User\Block\User\Edit\Tab\Main" type="Smile\RetailerAdmin\Rewrite\User\Block\User\Edit\Tab\Main" />
     <preference for="Smile\RetailerAdmin\Api\AdminRetailersInterface" type="Smile\RetailerAdmin\Model\AdminRetailers" />
 
+    <type name="Smile\RetailerAdmin\Model\AdminRetailers">
+        <arguments>
+            <argument name="authSession" xsi:type="object">Magento\Backend\Model\Auth\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Smile\RetailerAdmin\Helper\FilterHelper">
+        <arguments>
+            <argument name="adminRetailers" xsi:type="object">Smile\RetailerAdmin\Api\AdminRetailersInterface\Proxy</argument>
+        </arguments>
+    </type>
+
     <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid">
         <arguments>
             <argument name="columns" xsi:type="array">

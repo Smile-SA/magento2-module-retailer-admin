@@ -1,15 +1,7 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Florent Maissiat <florent.maissiat@smile.eu>
- * @copyright 2019 Smile
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Plugin\Framework\Data\Collection;
 
 use Magento\Framework\Data\Collection\AbstractDb;
@@ -17,41 +9,25 @@ use Magento\Framework\Registry;
 use Smile\RetailerAdmin\Api\AdminRetailersInterface;
 use Smile\RetailerAdmin\Helper\FilterHelper;
 
-/**
- * Class AbstractDbPlugin
- *
- * @package Smile\RetailerAdmin\Plugin\Framework\Data\Collection
- */
 class AbstractDbPlugin
 {
-    /** @var FilterHelper */
-    protected $filterHelper;
-
-    /** @var Registry */
-    protected $registry;
-
     /**
      * AbstractDbPlugin constructor.
      *
      * @param FilterHelper $filterHelper Filter helper.
      * @param Registry     $registry     Registry.
      */
-    public function __construct(FilterHelper $filterHelper, Registry $registry)
+    public function __construct(protected FilterHelper $filterHelper, protected Registry $registry)
     {
-        $this->filterHelper = $filterHelper;
-        $this->registry = $registry;
     }
 
     /**
      * Add "on the fly" a filter on any tables that have a seller based on allowed retailer of the current admin user.
      *
      * @param AbstractDb $subject The plugin subject.
-     *
-     * @return array
-     *
      * @throws \Zend_Db_Select_Exception
      */
-    public function beforeGetSelectCountSql(AbstractDb $subject)
+    public function beforeGetSelectCountSql(AbstractDb $subject): array
     {
         if ($this->registry->registry(AdminRetailersInterface::PREVENT_FILTER_FLAG)) {
             return [];
@@ -73,7 +49,10 @@ class AbstractDbPlugin
 
             foreach ($foreignKeys as $foreignKey) {
                 if ($foreignKey['REF_TABLE_NAME'] === $retailerTableName) {
-                    $subject->getSelect()->where($alias . '.'. $foreignKey['COLUMN_NAME'].' in (?)', $adminRetailerIds);
+                    $subject->getSelect()->where(
+                        $alias . '.' . $foreignKey['COLUMN_NAME'] . ' in (?)',
+                        $adminRetailerIds
+                    );
                 }
             }
         }
