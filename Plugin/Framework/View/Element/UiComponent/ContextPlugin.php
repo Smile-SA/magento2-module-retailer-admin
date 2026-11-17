@@ -1,39 +1,22 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Fanny DECLERCK <fadec@smile.fr>
- * @copyright 2019 Smile
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Plugin\Framework\View\Element\UiComponent;
 
 use Magento\Framework\View\Element\UiComponent\Context;
 use Magento\Framework\View\Element\UiComponentInterface;
 use Smile\RetailerAdmin\Helper\FilterHelper;
 
-/**
- * Class ContextPlugin
- *
- * @package Smile/RetailerAdmin/Plugin/Framework/View/Element/UiComponent
- */
 class ContextPlugin
 {
-    /** @var FilterHelper */
-    protected $filterHelper;
-
     /**
      * ContextPlugin constructor.
      *
      * @param FilterHelper $filterHelper Filter helper.
      */
-    public function __construct(FilterHelper $filterHelper)
+    public function __construct(protected FilterHelper $filterHelper)
     {
-        $this->filterHelper = $filterHelper;
     }
 
     /**
@@ -42,13 +25,12 @@ class ContextPlugin
      * @param Context              $subject   Subject.
      * @param array                $buttons   Buttons.
      * @param UiComponentInterface $component Component.
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameters)
      */
-    public function beforeAddButtons(Context $subject, array $buttons, UiComponentInterface $component)
+    public function beforeAddButtons(Context $subject, array $buttons, UiComponentInterface $component): array
     {
-        if (isset($buttons['add'])
+        if (
+            isset($buttons['add'])
             && isset($buttons['add']['id'])
             && $buttons['add']['id'] == 'add-new-retailer'
         ) {

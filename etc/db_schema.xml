@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <!-- magento_rma_grid (Commerce only) is handled by Setup/Patch/Schema/AddSellerIdOnRmaGrid -->
+    <table name="sales_order_grid" resource="sales" engine="innodb">
+        <column xsi:type="int" name="seller_id" unsigned="true" nullable="true" default="null"
+                comment="Seller ID"/>
+        <constraint xsi:type="foreign" referenceId="SALES_ORDER_GRID_SELLER_ID_SMILE_SELLER_ENTITY_ENTITY_ID"
+                    table="sales_order_grid" column="seller_id"
+                    referenceTable="smile_seller_entity" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+    </table>
+    <table name="sales_invoice_grid" resource="sales" engine="innodb">
+        <column xsi:type="int" name="seller_id" unsigned="true" nullable="true" default="null"
+                comment="Seller ID"/>
+        <constraint xsi:type="foreign" referenceId="SALES_INVOICE_GRID_SELLER_ID_SMILE_SELLER_ENTITY_ENTITY_ID"
+                    table="sales_invoice_grid" column="seller_id"
+                    referenceTable="smile_seller_entity" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+    </table>
+    <table name="sales_shipment_grid" resource="sales" engine="innodb">
+        <column xsi:type="int" name="seller_id" unsigned="true" nullable="true" default="null"
+                comment="Seller ID"/>
+        <constraint xsi:type="foreign" referenceId="SALES_SHIPMENT_GRID_SELLER_ID_SMILE_SELLER_ENTITY_ENTITY_ID"
+                    table="sales_shipment_grid" column="seller_id"
+                    referenceTable="smile_seller_entity" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+    </table>
+    <table name="sales_creditmemo_grid" resource="sales" engine="innodb">
+        <column xsi:type="int" name="seller_id" unsigned="true" nullable="true" default="null"
+                comment="Seller ID"/>
+        <constraint xsi:type="foreign" referenceId="SALES_CREDITMEMO_GRID_SELLER_ID_SMILE_SELLER_ENTITY_ENTITY_ID"
+                    table="sales_creditmemo_grid" column="seller_id"
+                    referenceTable="smile_seller_entity" referenceColumn="entity_id"
+                    onDelete="SET NULL"/>
+    </table>
+</schema>

@@ -1,56 +1,29 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * Helper class.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Florent Maissiat <florent.maissiat@smile.eu>
- * @copyright 2019 Smile
- * @license   OSL-3.0 https://opensource.org/licenses/OSL-3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Helper;
 
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\EntityManager\MetadataPool;
 use Smile\Retailer\Api\Data\RetailerInterface;
 use Smile\RetailerAdmin\Api\AdminRetailersInterface;
-use Smile\RetailerAdmin\Api\AdminRetailersInterface\Proxy;
 
-/**
- * Class FilterHelper
- *
- * @package Smile\RetailerAdmin\Helper
- */
 class FilterHelper
 {
-    /** @var MetadataPool */
-    protected $metadataPool;
-
-    /** @var AdminRetailersInterface */
-    protected $adminRetailers;
-
     /**
      * FilterHelper constructor.
      *
      * @param MetadataPool            $metadataPool   Entities metadata.
      * @param AdminRetailersInterface $adminRetailers Retailers of the current admin.
      */
-    public function __construct(MetadataPool $metadataPool, AdminRetailersInterface\Proxy $adminRetailers)
+    public function __construct(protected MetadataPool $metadataPool, protected AdminRetailersInterface $adminRetailers)
     {
-        $this->metadataPool = $metadataPool;
-        $this->adminRetailers = $adminRetailers;
     }
 
     /**
      * Get the table name of Retailer/Seller.
      * (Table prefix included)
-     *
-     * @return string
      *
      * @throws \Exception
      */
@@ -64,8 +37,6 @@ class FilterHelper
     /**
      * Get the primary key of the Retailer/Seller table.
      *
-     * @return string
-     *
      * @throws \Exception
      */
     public function getSellerPrimaryKey(): string
@@ -77,7 +48,6 @@ class FilterHelper
      * Get the list of Retailer/Seller id to use in filtering.
      *
      * @param bool $defaultToAll When true, if there are not ids, returns all ids
-     *
      * @return int[]
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
@@ -93,12 +63,9 @@ class FilterHelper
      * @param string     $alias      The retailer/seller table alias
      *                               (set null, if the collection is the retailer/seller table)
      * @param string     $column     The column to filter (set null to use the retailer/seller one)
-     *
-     * @return void
-     *
      * @throws \Exception
      */
-    public function applyFilterOnCollection(AbstractDb $collection, string $alias = null, string $column = null)
+    public function applyFilterOnCollection(AbstractDb $collection, ?string $alias = null, ?string $column = null): void
     {
         $sellerIds = $this->getFilterSellerIds(false);
 
