@@ -30,7 +30,7 @@ class AbstractCollectionPlugin
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @throws \Exception
      */
-    public function beforeLoad(AbstractCollection $subject, mixed $printQuery = false, mixed $logQuery = false): array
+    public function beforeLoad(AbstractCollection $subject, $printQuery = false, $logQuery = false): array
     {
         if ($this->registry->registry(AdminRetailersInterface::PREVENT_FILTER_FLAG)) {
             return [$printQuery, $logQuery];
