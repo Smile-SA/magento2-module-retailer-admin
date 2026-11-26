@@ -1,65 +1,46 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Florent Maissiat <florent.maissiat@smile.eu>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Model;
 
 use Magento\Backend\Model\Auth\Session;
-use Magento\Backend\Model\Auth\Session\Proxy;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Registry;
+use RuntimeException;
 use Smile\Retailer\Api\Data\RetailerInterface;
 use Smile\Retailer\Api\RetailerRepositoryInterface;
 use Smile\RetailerAdmin\Api\AdminRetailersInterface;
 
+use function is_string;
+
 /**
- * Class AdminRetailers
+ * Retailers allowed for the current admin user.
  *
- * @package Smile\RetailerAdmin\Model
+ * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
  */
 class AdminRetailers implements AdminRetailersInterface
 {
     /**
      * Instance cache for the current Admin retailer
-     *
-     * @var RetailerInterface
      */
-    private $retailer;
+    private ?RetailerInterface $retailer = null;
 
     /**
      * Instance cache for the current Admin retailers
      *
      * @var RetailerInterface[]
      */
-    private $retailers;
+    private ?array $retailers = null;
 
-    /** @var Session */
-    protected $authSession;
-
-    /** @var RetailerRepositoryInterface */
-    protected $retailerRepository;
-
-    /** @var SearchCriteriaBuilderFactory */
-    protected $criteriaBuilderFactory;
-
-    /** @var Registry */
-    protected $registry;
+    protected SearchCriteriaBuilderFactory $criteriaBuilderFactory;
 
     /**
      * Instance cache for the list of all retailers
      *
      * @var RetailerInterface[]
      */
-    protected $allRetailers;
+    protected ?array $allRetailers = null;
 
     /**
      * AdminRetailers constructor.
@@ -70,37 +51,32 @@ class AdminRetailers implements AdminRetailersInterface
      * @param SearchCriteriaBuilderFactory $criteriaBuilder    Criteria Builder.
      */
     public function __construct(
-        Session\Proxy $authSession,
-        RetailerRepositoryInterface $retailerRepository,
-        Registry $registry,
+        protected Session $authSession,
+        protected RetailerRepositoryInterface $retailerRepository,
+        protected Registry $registry,
         SearchCriteriaBuilderFactory $criteriaBuilder
     ) {
-        $this->authSession = $authSession;
-        $this->retailerRepository = $retailerRepository;
         $this->criteriaBuilderFactory = $criteriaBuilder;
-        $this->registry = $registry;
     }
 
     /**
      * Get the retailer of the current Admin
-     *
-     * @return RetailerInterface
      *
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getAdminRetailer(): RetailerInterface
     {
         if (!$this->retailer) {
-            $customerExtra = $this->authSession->getUser()->getExtra();
-            $retailerId = $customerExtra['retailers'] ?? [];
-
-            $retailerId = reset($retailerId);
+            $retailerIds = $this->getAuthSessionData();
+            $retailerId = reset($retailerIds);
 
             if ($retailerId === false) {
-                throw new \RuntimeException(__('Retailer ID is missing'));
+                throw new RuntimeException(__('Retailer ID is missing')->render());
             }
 
-            $this->retailer = $this->retailerRepository->get($retailerId);
+            /** @var RetailerInterface $retailer */
+            $retailer = $this->retailerRepository->get((int) $retailerId);
+            $this->retailer = $retailer;
         }
 
         return $this->retailer;
@@ -110,10 +86,8 @@ class AdminRetailers implements AdminRetailersInterface
      * Set Retailers.
      *
      * @param array $retailers Retailers.
-     *
-     * @return void
      */
-    public function setRetailers(array $retailers)
+    public function setRetailers(array $retailers): void
     {
         $this->retailers = $retailers;
     }
@@ -122,12 +96,9 @@ class AdminRetailers implements AdminRetailersInterface
      * Get all Retailer Ids associated to the current Admin user
      *
      * @param bool $defaultToAll if true, no value mean all retailer
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getAdminRetailerIds(bool $defaultToAll = true)
+    public function getAdminRetailerIds(bool $defaultToAll = true): array
     {
         $retailerIds = $this->getAdminRetailers(false);
 
@@ -135,8 +106,8 @@ class AdminRetailers implements AdminRetailersInterface
             $retailerIds = $this->getAllRetailers();
         }
 
-        return  array_map(function (RetailerInterface $retailer) : int {
-            return $retailer->getId();
+        return  array_map(function (RetailerInterface $retailer): int {
+            return (int) $retailer->getId();
         }, $retailerIds);
     }
 
@@ -144,12 +115,10 @@ class AdminRetailers implements AdminRetailersInterface
      * Get the retailer of the current Admin
      *
      * @param bool $defaultToAll If no retailers is found on the admin user, all retailer is returned
-     *
      * @return RetailerInterface[]
-     *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getAdminRetailers(bool $defaultToAll = true)
+    public function getAdminRetailers(bool $defaultToAll = true): array
     {
         if (!$this->retailers) {
             $retailerIds = $this->getAuthSessionData();
@@ -175,8 +144,6 @@ class AdminRetailers implements AdminRetailersInterface
 
     /**
      * Get the list of retailer ids set on the admin user.
-     *
-     * @return array
      */
     protected function getAuthSessionData(): array
     {
@@ -184,7 +151,7 @@ class AdminRetailers implements AdminRetailersInterface
             return [];
         }
         $customerExtra = $this->authSession->getUser() ? $this->authSession->getUser()->getExtra() : [];
-        if (\is_string($customerExtra)) {
+        if (is_string($customerExtra)) {
             $customerExtra = json_decode($customerExtra, true);
         }
 

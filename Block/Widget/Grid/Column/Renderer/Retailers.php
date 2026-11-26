@@ -1,35 +1,18 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Fanny DECLERCK <fadec@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Block\Widget\Grid\Column\Renderer;
 
 use Magento\Backend\Block\Context;
 use Magento\Backend\Block\Widget\Grid\Column\Renderer\AbstractRenderer;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\DataObject;
 use Smile\Retailer\Api\RetailerRepositoryInterface;
 
-/**
- * Class Retailers
- *
- * @package Smile\RetailerAdmin\Block\Widget\Grid\Column\Renderer
- */
 class Retailers extends AbstractRenderer
 {
-    /** @var RetailerRepositoryInterface */
-    protected $retailerRepository;
-
-    /** @var SearchCriteriaBuilderFactory*/
-    protected $criteriaBuilderFactory;
+    protected SearchCriteriaBuilderFactory $criteriaBuilderFactory;
 
     /**
      * Retailers constructor.
@@ -41,13 +24,12 @@ class Retailers extends AbstractRenderer
      */
     public function __construct(
         Context $context,
-        RetailerRepositoryInterface $retailerRepository,
+        protected RetailerRepositoryInterface $retailerRepository,
         SearchCriteriaBuilderFactory $criteriaBuilder,
         array $data = []
     ) {
         parent::__construct($context, $data);
 
-        $this->retailerRepository     = $retailerRepository;
         $this->criteriaBuilderFactory = $criteriaBuilder;
     }
 
@@ -55,10 +37,8 @@ class Retailers extends AbstractRenderer
      * Returns formatted data.
      *
      * @param \Magento\Framework\DataObject $row Row.
-     *
-     * @return string
      */
-    public function render(\Magento\Framework\DataObject $row)
+    public function render(DataObject $row): string
     {
         $extra = $row->getExtra() ?? [];
         if (is_string($extra)) {

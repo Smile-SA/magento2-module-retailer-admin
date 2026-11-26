@@ -1,37 +1,22 @@
 <?php
-/**
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to newer
- * versions in the future.
- *
- * @category  Smile
- * @package   Smile\RetailerAdmin
- * @author    Florent Maissiat <florent.maissiat@smile.eu>
- * @author    Fanny DECLERCK <fadec@smile.fr>
- * @copyright 2019 Smile
- * @license   Open Software License ("OSL") v. 3.0
- */
+
+declare(strict_types=1);
+
 namespace Smile\RetailerAdmin\Rewrite\User\Block\User\Edit\Tab;
 
+use Magento\Backend\Block\Template\Context;
+use Magento\Backend\Block\Widget\Form;
+use Magento\Backend\Model\Auth\Session;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Data\FormFactory;
+use Magento\Framework\Locale\ListsInterface;
 use Magento\Framework\Locale\OptionInterface;
+use Magento\Framework\Registry;
 use Smile\Retailer\Api\Data\RetailerInterface;
 use Smile\Retailer\Api\RetailerRepositoryInterface;
 
-/**
- * Class Main
- *
- * @package Smile\RetailerAdmin\Rewrite\User\Block\User\Edit\Tab
- */
 class Main extends \Magento\User\Block\User\Edit\Tab\Main
 {
-    /** @var RetailerRepositoryInterface */
-    protected $retailerRepository;
-
-    /** @var SearchCriteriaBuilderFactory*/
-    protected $searchCriteriaBuilder;
-
     /**
      * Main constructor.
      *
@@ -46,20 +31,17 @@ class Main extends \Magento\User\Block\User\Edit\Tab\Main
      * @param OptionInterface|null                     $deployedLocales       List of installed locales
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\Data\FormFactory $formFactory,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\Locale\ListsInterface $localeLists,
-        RetailerRepositoryInterface $retailerRepository,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilder,
+        Context $context,
+        Registry $registry,
+        FormFactory $formFactory,
+        Session $authSession,
+        ListsInterface $localeLists,
+        protected RetailerRepositoryInterface $retailerRepository,
+        protected SearchCriteriaBuilderFactory $searchCriteriaBuilder,
         array $data = [],
-        OptionInterface $deployedLocales = null
+        ?OptionInterface $deployedLocales = null
     ) {
         parent::__construct($context, $registry, $formFactory, $authSession, $localeLists, $data, $deployedLocales);
-
-        $this->retailerRepository    = $retailerRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -67,18 +49,17 @@ class Main extends \Magento\User\Block\User\Edit\Tab\Main
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CamelCaseMethodName) - Magento property name.
-     * @return \Magento\Backend\Block\Widget\Form
      */
-    protected function _prepareForm()
+    protected function _prepareForm(): Form
     {
         parent::_prepareForm();
 
         $form = $this->getForm();
 
-        /** @var $model \Magento\User\Model\User */
+        /** @var \Magento\User\Model\User $model */
         $model = $this->_coreRegistry->registry('permissions_user');
 
-        $extra = $model->getExtra() ?? [];
+        $extra = $model->getData('extra') ?? [];
         if (is_string($extra)) {
             $extra = json_decode($extra, true);
         }
@@ -100,10 +81,8 @@ class Main extends \Magento\User\Block\User\Edit\Tab\Main
 
     /**
      * Returns retailers list of options.
-     *
-     * @return array
      */
-    protected function getRetailersListToOptionArray()
+    protected function getRetailersListToOptionArray(): array
     {
         $searchResults = $this->retailerRepository->getList($this->searchCriteriaBuilder->create()->create());
 
